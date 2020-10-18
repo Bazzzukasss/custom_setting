@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CustomSettingWidget</class>
+ <widget class="QWidget" name="CustomSettingWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>309</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="CustomCheckBox" name="mCheckBox">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="CustomSpinBox" name="mSpinBox"/>
+   </item>
+   <item>
+    <widget class="CustomDoubleSpinBox" name="mDoubleSpinBox"/>
+   </item>
+   <item>
+    <widget class="CustomLineEdit" name="mLineEdit"/>
+   </item>
+   <item>
+    <widget class="CustomComboBox" name="mComboBox"/>
+   </item>
+   <item>
+    <widget class="CustomListBox" name="mListBox"/>
+   </item>
+   <item>
+    <widget class="CustomSourceButton" name="mSourceButton">
+     <property name="text">
+      <string>PushButton</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="CustomColorButton" name="mColorButton">
+     <property name="text">
+      <string>PushButton</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="CustomFontButton" name="mFontButton">
+     <property name="text">
+      <string>PushButton</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="CustomTextEdit" name="mTextEdit"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomComboBox</class>
+   <extends>QComboBox</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomListBox</class>
+   <extends>QComboBox</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomSourceButton</class>
+   <extends>QPushButton</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomFontButton</class>
+   <extends>QPushButton</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomColorButton</class>
+   <extends>QPushButton</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
