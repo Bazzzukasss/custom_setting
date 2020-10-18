@@ -1,11 +1,12 @@
 #pragma once
 
-#include "custom_setting.h"
 #include <QDir>
 #include <QApplication>
 
 namespace custom_setting
 {
+
+class Setting;
 /**
  * Class Configurator
  * @brief Base class for application settings managing

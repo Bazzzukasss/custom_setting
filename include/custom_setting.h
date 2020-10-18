@@ -3,11 +3,12 @@
 #include <QSettings>
 #include <functional>
 #include "custom_setting_data.h"
-#include "custom_setting_loader.h"
+#include "custom_setting_manager.h"
 
 namespace custom_setting
 {
 
+class Serializer;
 /**
  * Class CustomSetting
  * @brief General base class for any kind of application settings subclasses. Provides unific interface for
@@ -23,8 +24,6 @@ class Setting : public QObject
     virtual ~Setting() = default;
 
     void addSettings(const Vec& settings);
-    virtual void load(Loader* loader, const QString& parentKey = {});
-    virtual void save(Loader* loader, const QString& parentKey = {});
     void bindTo(std::function<void(const QVariant&)> procedure);
     void bindTo(std::function<void(void)> procedure);
 
@@ -51,6 +50,12 @@ signals:
     QString mKey;
     QString mCaption;
     QString mDescription;
+
+private:
+    virtual void load(Serializer* serializer, const QString& parentKey = {});
+    virtual void save(Serializer* serializer, const QString& parentKey = {});
+
+friend Manager;
 };
 
 /**
@@ -131,9 +136,6 @@ class SettingArray : public Setting
 
     inline void addSettings(QVector<Setting*> settings) = delete;
 
-    void load(Loader* loader, const QString& parentKey) override;
-    void save(Loader* loader, const QString& parentKey) override;
-
     void setData(const QVector<T>& data) { mData = data; }
     QVector<T>& getData() { return mData; }
     void clearData();
@@ -158,6 +160,9 @@ class SettingArray : public Setting
  private:
     int mArrayIndex;
     QVector<T> mData;
+
+    void load(Serializer* loader, const QString& parentKey) override;
+    void save(Serializer* loader, const QString& parentKey) override;
 };
 
 template <typename T>
@@ -169,7 +174,7 @@ SettingArray<T>::SettingArray(const QString& key, const QString& caption, const 
 {}
 
 template <typename T>
-void SettingArray<T>::load(Loader* loader, const QString& parentKey)
+void SettingArray<T>::load(Serializer* loader, const QString& parentKey)
 {/*
     const auto& key = parentKey + "/" + mKey;
 
@@ -191,7 +196,7 @@ void SettingArray<T>::load(Loader* loader, const QString& parentKey)
 }
 
 template <typename T>
-void SettingArray<T>::save(Loader* loader, const QString& parentKey)
+void SettingArray<T>::save(Serializer* loader, const QString& parentKey)
 {/*
     const auto& key = parentKey + "/" + mKey;
 

@@ -1,5 +1,6 @@
 #include "custom_setting_manager.h"
-#include "custom_setting_loader.h"
+#include "custom_setting_serializer.h"
+#include "custom_setting.h"
 
 using namespace custom_setting;
 
@@ -10,10 +11,10 @@ void Manager::loadConfigurations()
 {
     for (auto& filename : mConfigurations.keys())
     {
-        auto loader = Loader::create(getSettingsDirPath() + filename, parent());
-        if(loader)
+        auto serializer = Serializer::create(getSettingsDirPath() + filename, Serializer::Mode::kRead, parent());
+        if(serializer)
         {
-            mConfigurations[filename]->load(loader);
+            mConfigurations[filename]->load(serializer);
         }
     }
 
@@ -24,10 +25,11 @@ void Manager::saveConfigurations()
 {
     for (auto& filename : mConfigurations.keys())
     {
-        auto loader = Loader::create(getSettingsDirPath() + filename, this);
-        if(loader)
+        auto serializer = Serializer::create(getSettingsDirPath() + filename, Serializer::Mode::kWrite, this);
+        if(serializer)
         {
-            mConfigurations[filename]->save(loader);
+            mConfigurations[filename]->save(serializer);
+            serializer->sync();
         }
     }
 }

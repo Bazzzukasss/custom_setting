@@ -1,4 +1,5 @@
 #include "custom_setting.h"
+#include "custom_setting_serializer.h"
 
 using namespace custom_setting;
 
@@ -19,10 +20,10 @@ void Setting::addSettings(const Vec &settings)
     }
 }
 
-void Setting::load(Loader* loader, const QString& parentKey)
+void Setting::load(Serializer* serializer, const QString& parentKey)
 {
     const auto& key = parentKey + "/" + mKey;
-    auto value      = loader->getValue(key, getDefaultValue());
+    auto value      = serializer->getValue(key, getDefaultValue(), !mSettings.isEmpty());
     if (value.isValid())
     {
         setValue(value);
@@ -30,22 +31,22 @@ void Setting::load(Loader* loader, const QString& parentKey)
 
     for (auto& customSetting : mSettings)
     {
-        customSetting->load(loader, key);
+        customSetting->load(serializer, key);
     }
 }
 
-void Setting::save(Loader* loader, const QString& parentKey)
+void Setting::save(Serializer* serializer, const QString& parentKey)
 {
     const auto& key   = parentKey + "/" + mKey;
     const auto& value = getValue();
     if (value.isValid())
     {
-        loader->setValue(key, value);
+        serializer->setValue(key, value, !mSettings.isEmpty());
     }
 
     for (auto& customSetting : mSettings)
     {
-        customSetting->save(loader, key);
+        customSetting->save(serializer, key);
     }
 }
 
@@ -64,7 +65,7 @@ bool Setting::isAnyChecked() const
     bool res{false};
     for (auto setting : getSettings())
     {
-        auto boolSetting = dynamic_cast<SettingExt<DataBool>*>(setting);
+        auto boolSetting = dynamic_cast<SettingBool*>(setting);
         if (boolSetting)
         {
             res |= *boolSetting;
