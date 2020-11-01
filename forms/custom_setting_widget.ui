@@ -30,6 +30,13 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="CustomLabel" name="mLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="CustomCheckBox" name="mCheckBox">
      <property name="text">
       <string/>
@@ -54,21 +61,21 @@
    <item>
     <widget class="CustomSourceButton" name="mSourceButton">
      <property name="text">
-      <string>PushButton</string>
+      <string/>
      </property>
     </widget>
    </item>
    <item>
     <widget class="CustomColorButton" name="mColorButton">
      <property name="text">
-      <string>PushButton</string>
+      <string/>
      </property>
     </widget>
    </item>
    <item>
     <widget class="CustomFontButton" name="mFontButton">
      <property name="text">
-      <string>PushButton</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -126,6 +133,11 @@
   <customwidget>
    <class>CustomColorButton</class>
    <extends>QPushButton</extends>
+   <header>custom_widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomLabel</class>
+   <extends>QLabel</extends>
    <header>custom_widgets.h</header>
   </customwidget>
  </customwidgets>

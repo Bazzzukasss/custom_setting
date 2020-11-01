@@ -456,3 +456,69 @@ void CustomListBox::update()
         emit signalStateChanged();
     }
 }
+
+CustomLabel::CustomLabel(QWidget *parent) : QLabel(parent), mSetting(nullptr)
+{}
+
+void CustomLabel::bindToSetting(Setting *setting)
+{
+    if (setting != nullptr)
+    {
+        mSetting = setting;
+
+        connect(mSetting, &Setting::signalDataChanged, this, &CustomLabel::update);
+        update();
+    }
+}
+
+void CustomLabel::update()
+{
+    auto boolSetting            = dynamic_cast<SettingBool*>(mSetting);
+    auto intSetting             = dynamic_cast<SettingInt*>(mSetting);
+    auto doubleSetting          = dynamic_cast<SettingDouble*>(mSetting);
+    auto stringSetting          = dynamic_cast<SettingString*>(mSetting);
+    auto listSetting            = dynamic_cast<SettingStringList*>(mSetting);
+    auto fontSetting            = dynamic_cast<SettingFont*>(mSetting);
+    auto colorSetting           = dynamic_cast<SettingColor*>(mSetting);
+    auto sourceSetting          = dynamic_cast<SettingSource*>(mSetting);
+    auto changeableListSetting  = dynamic_cast<SettingChangeableList*>(mSetting);
+    //auto editableListSetting    = dynamic_cast<SettingEditableList*>(mSetting);
+
+    if(boolSetting)
+    {
+        setText(boolSetting ? "Yes" : "No");
+    }
+    else if(intSetting)
+    {
+        setText(QString("%1%2").arg(intSetting->getData().value).arg(intSetting->getData().suffix));
+    }
+    else if(doubleSetting)
+    {
+        setText(QString("%1%2").arg(doubleSetting->getData().value).arg(doubleSetting->getData().suffix));
+    }
+    else if(stringSetting)
+    {
+        setText(stringSetting->getData().value);
+    }
+    else if(listSetting)
+    {
+        setText(listSetting->getData().value);
+    }
+    else if(sourceSetting)
+    {
+        setText(sourceSetting->getData().value);
+    }
+    else if(changeableListSetting)
+    {
+        setText(changeableListSetting->getData().value.at(0));
+    }
+    else if(fontSetting)
+    {
+        setFont(fontSetting->getData().value);
+        setText("Font");
+    }
+    else if(colorSetting)
+    {
+        setStyleSheet(QString("background-color: %1;").arg(colorSetting->getData().value.name()));
+    }
+}

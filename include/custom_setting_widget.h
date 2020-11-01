@@ -19,5 +19,7 @@ public:
     void bindToSetting(custom_setting::Setting* setting);
 
 private:
+    void hideAll();
+
     Ui::CustomSettingWidget *ui;
 };

@@ -52,3 +52,16 @@ CUSTOM_WIDGET(CustomColorButton, QPushButton, SettingColor)
 CUSTOM_WIDGET(CustomSourceButton, QPushButton, SettingSource)
 CUSTOM_WIDGET(CustomTextEdit, QTextEdit, SettingEditableList)
 CUSTOM_WIDGET(CustomListBox, QComboBox, SettingChangeableList)
+
+class CustomLabel : public QLabel
+{
+    Q_OBJECT
+
+ public:
+    explicit CustomLabel(QWidget* parent = nullptr);
+    void bindToSetting(custom_setting::Setting* setting);
+
+ private:
+    void update();
+    custom_setting::Setting* mSetting;
+};
