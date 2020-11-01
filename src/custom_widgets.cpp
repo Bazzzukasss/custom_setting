@@ -17,8 +17,19 @@ void CustomSpinBox::bindToSetting(CustomSpinBox::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setMinimum(mSetting->getData().minimum);
+        setMaximum(mSetting->getData().maximum);
+        setSuffix(mSetting->getData().suffix);
+        setValue(mSetting->getData().value);
+        setReadOnly(mSetting->isReadOnly());
+        if(mSetting->isReadOnly())
+        {
+            setButtonSymbols(ButtonSymbols::NoButtons);
+        }
+
         connect(this, &CustomSpinBox::editingFinished, this, [&]() { mSetting->setDataValue(value()); });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomSpinBox::update);
+
         update();
     }
 }
@@ -27,10 +38,9 @@ void CustomSpinBox::update()
 {
     if (mSetting != nullptr)
     {
-        setMinimum(mSetting->getData().minimum);
-        setMaximum(mSetting->getData().maximum);
-        setSuffix(mSetting->getData().suffix);
+        blockSignals(true);
         setValue(mSetting->getData().value);
+        blockSignals(false);
 
         emit signalStateChanged();
     }
@@ -44,8 +54,13 @@ void CustomSlider::bindToSetting(CustomSlider::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setMinimum(mSetting->getData().minimum);
+        setMaximum(mSetting->getData().maximum);
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomSlider::valueChanged, this, [&]() { mSetting->setDataValue(value()); });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomSlider::update);
+
         update();
     }
 }
@@ -54,10 +69,9 @@ void CustomSlider::update()
 {
     if (mSetting != nullptr)
     {
-        setMinimum(mSetting->getData().minimum);
-        setMaximum(mSetting->getData().maximum);
+        blockSignals(true);
         setValue(mSetting->getData().value);
-
+        blockSignals(false);
         emit signalStateChanged();
     }
 }
@@ -70,8 +84,20 @@ void CustomDoubleSpinBox::bindToSetting(CustomDoubleSpinBox::SettingType* settin
     if (setting != nullptr)
     {
         mSetting = setting;
+        setMinimum(mSetting->getData().minimum);
+        setMaximum(mSetting->getData().maximum);
+        setDecimals(mSetting->getData().decimals);
+        setSuffix(mSetting->getData().suffix);
+        setValue(mSetting->getData().value);
+        setReadOnly(mSetting->isReadOnly());
+        if(mSetting->isReadOnly())
+        {
+            setButtonSymbols(ButtonSymbols::NoButtons);
+        }
+
         connect(this, &CustomDoubleSpinBox::editingFinished, this, [&]() { mSetting->setDataValue(value()); });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomDoubleSpinBox::update);
+
         update();
     }
 }
@@ -80,11 +106,9 @@ void CustomDoubleSpinBox::update()
 {
     if (mSetting != nullptr)
     {
-        setMinimum(mSetting->getData().minimum);
-        setMaximum(mSetting->getData().maximum);
-        setDecimals(mSetting->getData().decimals);
-        setSuffix(mSetting->getData().suffix);
+        blockSignals(true);
         setValue(mSetting->getData().value);
+        blockSignals(false);
 
         emit signalStateChanged();
     }
@@ -100,6 +124,8 @@ void CustomCheckBox::bindToSetting(CustomCheckBox::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomCheckBox::stateChanged, this, [&]() { mSetting->setDataValue(isChecked()); });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomCheckBox::update);
         update();
@@ -128,6 +154,7 @@ void CustomLineEdit::bindToSetting(CustomLineEdit::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setReadOnly(mSetting->isReadOnly());
 
         const auto& regexString = mSetting->getData().regexValidatorString;
         if (!regexString.isEmpty())
@@ -162,6 +189,8 @@ void CustomComboBox::bindToSetting(CustomComboBox::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomComboBox::currentTextChanged, this, [&]() { mSetting->setDataValue(currentText()); });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomComboBox::update);
         update();
@@ -195,6 +224,8 @@ void CustomFontButton::bindToSetting(CustomFontButton::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomFontButton::clicked, this, [&]() {
             bool ok{false};
             QFont fnt{QFontDialog::getFont(&ok, mSetting->getData().value)};
@@ -229,6 +260,8 @@ void CustomColorButton::bindToSetting(CustomColorButton::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomColorButton::clicked, this, [&]() {
             QColor clr{QColorDialog::getColor(mSetting->getData().value)};
             if (clr.isValid())
@@ -262,6 +295,8 @@ void CustomSourceButton::bindToSetting(CustomSourceButton::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomFontButton::clicked, this, [&]() {
             QString filename;
 
@@ -305,6 +340,8 @@ void CustomTextEdit::bindToSetting(CustomTextEdit::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setReadOnly(mSetting->isReadOnly());
+
         connect(this, &CustomTextEdit::textChanged, this, [&]() { mSetting->setDataValue(toPlainText().split("\n")); });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomTextEdit::update);
         update();
@@ -341,6 +378,8 @@ void CustomListBox::bindToSetting(CustomListBox::SettingType* setting)
     if (setting != nullptr)
     {
         mSetting = setting;
+        setEnabled(!mSetting->isReadOnly());
+
         connect(this, &CustomComboBox::currentTextChanged, this, [=](const QString& current_text) {
             QString newCurrentText{current_text};
             QStringList list;

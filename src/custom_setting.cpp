@@ -3,11 +3,12 @@
 
 using namespace custom_setting;
 
-Setting::Setting(const QString& key, const QString& caption, const QString& description, QObject* parent) :
+Setting::Setting(const QString& key, const QString& caption, const QString& description, bool read_only, QObject* parent) :
     QObject(parent),
     mKey(key),
     mCaption(caption),
-    mDescription(description)
+    mDescription(description),
+    mReadOnly(read_only)
 {}
 
 void Setting::addSettings(const Vec &settings)

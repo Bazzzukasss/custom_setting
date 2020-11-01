@@ -20,7 +20,7 @@ class Setting : public QObject
  public:
     using Vec = QVector<Setting*>;
 
-    Setting(const QString& key, const QString& caption, const QString& description, QObject* parent = nullptr);
+    Setting(const QString& key, const QString& caption, const QString& description, bool read_only = false, QObject* parent = nullptr);
     virtual ~Setting() = default;
 
     void addSettings(const Vec& settings);
@@ -31,7 +31,8 @@ class Setting : public QObject
     inline const QString& getCaption() const { return mCaption; }
     inline const QString& getDescription() const { return mDescription; }
     inline const Vec& getSettings() const { return mSettings; }
-    virtual bool isAnyChecked() const;
+    inline bool isReadOnly() const { return mReadOnly; }
+    virtual bool isAnyChecked() const;    
 
     /*Setters*/
     inline void setDescription(const QString& description) { mDescription = description; }
@@ -50,6 +51,7 @@ signals:
     QString mKey;
     QString mCaption;
     QString mDescription;
+    bool mReadOnly;
 
 private:
     virtual void load(Serializer* serializer, const QString& parentKey = {});
@@ -70,7 +72,7 @@ class SettingExt : public Setting
 
  public:
     SettingExt(const QString& key, const QString& caption, const QString& description, const T& data = {},
-                     QObject* parent = nullptr);
+                     bool read_only = false, QObject* parent = nullptr);
 
     void setData(const T& data) { mData = data; }
     T& getData() { return mData; }
@@ -93,8 +95,8 @@ class SettingExt : public Setting
 
 template <typename T>
 SettingExt<T>::SettingExt(const QString& key, const QString& caption, const QString& description,
-                                      const T& data, QObject* parent) :
-    Setting(key, caption, description, parent),
+                                      const T& data, bool read_only, QObject* parent) :
+    Setting(key, caption, description, read_only, parent),
     mData(data)
 {}
 
