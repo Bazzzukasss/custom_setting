@@ -48,6 +48,8 @@ class CustomSettingTreeWidget : public QWidget
     QTreeWidgetItem* add(custom_setting::Setting* setting, QTreeWidgetItem* item,
                                 const QIcon &icon, const QStringList& styles);
 
+    void setSizeHint(QWidget *widget);
+
     Ui::CustomSettingTreeWidget* ui;
     int mTreeLevel{0};
     int mItemHeight{kDefaultItemHeight};

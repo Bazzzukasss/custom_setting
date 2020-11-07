@@ -32,6 +32,7 @@ CustomSettingTreeWidget::CustomSettingTreeWidget(Setting *setting, QWidget *pare
     if(setting != nullptr)
     {
         add(setting);
+        setToolTip(setting->getDescription());
     }
 }
 
@@ -40,7 +41,7 @@ CustomSettingTreeWidget::~CustomSettingTreeWidget()
     delete ui;
 }
 
-QTreeWidgetItem* CustomSettingTreeWidget::add(custom_setting::Setting* setting, QTreeWidgetItem* item,
+QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, QTreeWidgetItem* item,
                                             const QIcon& icon, const QStringList& styles)
 {
     if (setting->getCaption().isEmpty())
@@ -84,6 +85,21 @@ QTreeWidgetItem* CustomSettingTreeWidget::add(custom_setting::Setting* setting, 
     return item;
 }
 
+void CustomSettingTreeWidget::setSizeHint(QWidget* widget)
+{
+    if (mItemHeight > 0)
+    {
+        widget->setMinimumHeight(mItemHeight);
+        widget->setMaximumHeight(mItemHeight * mRowsPerItem);
+    }
+
+    if (mItemWidth > 0)
+    {
+        widget->setMinimumWidth(mItemWidth);
+        widget->setMaximumWidth(mItemWidth);
+    }
+}
+
 QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, const QStringList& styles, const QIcon &icon)
 {
     return add(setting, nullptr, icon, styles);
@@ -97,20 +113,7 @@ QTreeView* CustomSettingTreeWidget::view()
 QWidget* CustomSettingTreeWidget::createCustomWidget(Setting* setting)
 {
     auto widget = new CustomSettingWidget(setting, this);
-
-    if (mItemHeight > 0)
-    {
-        widget->setMaximumHeight(mItemHeight);
-        widget->setMinimumHeight(mItemHeight);
-    }
-
-    if (mItemWidth > 0)
-    {
-        widget->setMaximumWidth(mItemWidth);
-        widget->setMinimumWidth(mItemWidth);
-    }
-
-    widget->setToolTip(setting->getDescription());
+    setSizeHint(widget);
 
     return widget;
 }
@@ -124,20 +127,7 @@ QWidget* CustomSettingTreeWidget::createCustomTreeWidget(Setting* setting)
     widget->setRowsPerItem(mRowsPerItem);
     widget->setOneClickMode(mIsOneClickMode);
     widget->view()->setAlternatingRowColors(view()->alternatingRowColors());
-
-    if (mItemHeight > 0)
-    {
-        widget->setMaximumHeight(mItemHeight * mRowsPerItem);
-        widget->setMinimumHeight(mItemHeight * mRowsPerItem);
-    }
-
-    if (mItemWidth > 0)
-    {
-        widget->setMaximumWidth(mItemWidth);
-        widget->setMinimumWidth(mItemWidth);
-    }
-
-    widget->setToolTip(setting->getDescription());
+    setSizeHint(widget);
 
     return widget;
 }

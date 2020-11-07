@@ -33,6 +33,7 @@ void CustomSettingWidget::bindToSetting(custom_setting::Setting *setting)
     }
 
     hideAll();
+    setToolTip(setting->getDescription());
 
     if(setting->isReadOnly())
     {

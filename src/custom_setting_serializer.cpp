@@ -105,7 +105,7 @@ void SerializerJson::write(QJsonObject &obj, const QString &key, const QVariant 
 
     if(n == -1)
     {
-        obj[key] = value.toJsonValue();
+        obj[key] = QJsonValue::fromVariant(value);
     }
     else
     {

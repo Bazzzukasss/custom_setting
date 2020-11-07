@@ -482,7 +482,7 @@ void CustomLabel::update()
     auto colorSetting           = dynamic_cast<SettingColor*>(mSetting);
     auto sourceSetting          = dynamic_cast<SettingSource*>(mSetting);
     auto changeableListSetting  = dynamic_cast<SettingChangeableList*>(mSetting);
-    //auto editableListSetting    = dynamic_cast<SettingEditableList*>(mSetting);
+    auto editableListSetting    = dynamic_cast<SettingEditableList*>(mSetting);
 
     if(boolSetting)
     {
@@ -520,5 +520,16 @@ void CustomLabel::update()
     else if(colorSetting)
     {
         setStyleSheet(QString("background-color: %1;").arg(colorSetting->getData().value.name()));
+    }
+    else if(editableListSetting)
+    {
+        QString lst;
+        auto count = editableListSetting->getData().value.size();
+        for(const auto& value : editableListSetting->getData().value)
+        {
+            lst+=value + (count > 1 ? "\n" : "");
+            count--;
+        }
+        setText(lst);
     }
 }
