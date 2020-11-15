@@ -32,6 +32,9 @@ void CustomSettingWidget::bindToSetting(custom_setting::Setting *setting)
         return;\
     }
 
+    if(!setting)
+        return;
+
     hideAll();
     setToolTip(setting->getDescription());
 
