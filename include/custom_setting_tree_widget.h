@@ -1,15 +1,10 @@
 #pragma once
 
-#include <QtWidgets>
+#include <QTreeWidget>
 #include "custom_setting.h"
 #include "custom_setting_item.h"
 
-namespace Ui
-{
-class CustomSettingTreeWidget;
-}
-
-class CustomSettingTreeWidget : public QWidget
+class CustomSettingTreeWidget : public QTreeWidget
 {
     Q_OBJECT
 
@@ -20,12 +15,9 @@ class CustomSettingTreeWidget : public QWidget
  public:
     explicit CustomSettingTreeWidget(QWidget* parent = nullptr);
     explicit CustomSettingTreeWidget(custom_setting::Setting* setting, QWidget* parent);
-    ~CustomSettingTreeWidget();
 
     QTreeWidgetItem* add(custom_setting::Setting* setting, const QStringList& styles = {},
                                 const QIcon& icon = {});
-
-    QTreeView* view();
 
     inline void setItemHeight(int height) { mItemHeight = height; }
     inline void setItemWidth(int width) { mItemWidth = width; }
@@ -50,7 +42,6 @@ class CustomSettingTreeWidget : public QWidget
 
     void setSizeHint(QWidget *widget);
 
-    Ui::CustomSettingTreeWidget* ui;
     int mTreeLevel{0};
     int mItemHeight{kDefaultItemHeight};
     int mItemWidth{kDefaultItemWidth};

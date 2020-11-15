@@ -11,20 +11,19 @@ CustomSettingTreeWidget::CustomSettingTreeWidget(QWidget* parent) :
 }
 
 CustomSettingTreeWidget::CustomSettingTreeWidget(Setting *setting, QWidget *parent) :
-    QWidget(parent), ui(new Ui::CustomSettingTreeWidget)
+    QTreeWidget(parent)
 {
-    ui->setupUi(this);
-
-    connect(ui->mTreeWidget, &QTreeView::clicked, [this]() {
-        if (mIsOneClickMode && ui->mTreeWidget->currentItem() && ui->mTreeWidget->currentItem()->childCount() > 0)
+    setHeaderHidden(true);
+    connect(this, &QTreeWidget::clicked, [this]() {
+        if (mIsOneClickMode && currentItem() && currentItem()->childCount() > 0)
         {
-            if (ui->mTreeWidget->isExpanded(ui->mTreeWidget->currentIndex()))
+            if (isExpanded(currentIndex()))
             {
-                ui->mTreeWidget->collapse(ui->mTreeWidget->currentIndex());
+                collapse(currentIndex());
             }
             else
             {
-                ui->mTreeWidget->expand(ui->mTreeWidget->currentIndex());
+                expand(currentIndex());
             }
         }
     });
@@ -34,11 +33,6 @@ CustomSettingTreeWidget::CustomSettingTreeWidget(Setting *setting, QWidget *pare
         add(setting);
         setToolTip(setting->getDescription());
     }
-}
-
-CustomSettingTreeWidget::~CustomSettingTreeWidget()
-{
-    delete ui;
 }
 
 QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, QTreeWidgetItem* item,
@@ -57,7 +51,7 @@ QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, QTreeWidgetItem*
 
     if (item == nullptr)
     {
-        ui->mTreeWidget->addTopLevelItem(sub_item);
+        addTopLevelItem(sub_item);
     }
     else
     {
@@ -105,11 +99,6 @@ QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, const QStringLis
     return add(setting, nullptr, icon, styles);
 }
 
-QTreeView* CustomSettingTreeWidget::view()
-{
-    return ui->mTreeWidget;
-}
-
 QWidget* CustomSettingTreeWidget::createCustomWidget(Setting* setting)
 {
     auto widget = new CustomSettingWidget(setting, this);
@@ -126,7 +115,7 @@ QWidget* CustomSettingTreeWidget::createCustomTreeWidget(Setting* setting)
     widget->setItemWidth(mItemWidth);
     widget->setRowsPerItem(mRowsPerItem);
     widget->setOneClickMode(mIsOneClickMode);
-    widget->view()->setAlternatingRowColors(view()->alternatingRowColors());
+    widget->setAlternatingRowColors(alternatingRowColors());
     setSizeHint(widget);
 
     return widget;
@@ -139,7 +128,7 @@ void CustomSettingTreeWidget::createCaptionWidget(Setting *setting, QTreeWidgetI
     captionWidget->setMinimumHeight(mItemHeight);
     captionWidget->setStyleSheet(style);
     captionWidget->setToolTip(mShowTooltips ? setting->getDescription() : "");
-    ui->mTreeWidget->setItemWidget(sub_item, 0, captionWidget);
+    setItemWidget(sub_item, 0, captionWidget);
 }
 
 void CustomSettingTreeWidget::createValuesWidget(Setting *setting, QTreeWidgetItem *sub_item, const QString& style)
@@ -148,7 +137,7 @@ void CustomSettingTreeWidget::createValuesWidget(Setting *setting, QTreeWidgetIt
     if (valueWidget)
     {
         valueWidget->setStyleSheet(style);
-        ui->mTreeWidget->setItemWidget(sub_item, 1, valueWidget);
+        setItemWidget(sub_item, 1, valueWidget);
     }
 }
 
@@ -156,9 +145,9 @@ void CustomSettingTreeWidget::createValuesWidget(Item* setting_item, QTreeWidget
 {
     int column{1};
     auto settings = setting_item->getSettings();
-    if(ui->mTreeWidget->columnCount() < settings.size())
+    if(columnCount() < settings.size())
     {
-        ui->mTreeWidget->setColumnCount(settings.size() + 1);
+        setColumnCount(settings.size() + 1);
     }
 
     for (auto setting : settings)
@@ -168,7 +157,7 @@ void CustomSettingTreeWidget::createValuesWidget(Item* setting_item, QTreeWidget
         if (valueWidget)
         {
             valueWidget->setStyleSheet(style);
-            ui->mTreeWidget->setItemWidget(sub_item, column++, valueWidget);
+            setItemWidget(sub_item, column++, valueWidget);
         }
     }
 }
