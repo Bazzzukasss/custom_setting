@@ -79,30 +79,51 @@ QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, QTreeWidgetItem*
     return item;
 }
 
-void CustomSettingTreeWidget::setSizeHint(QWidget* widget)
-{
-    if (mItemHeight > 0)
-    {
-        widget->setMinimumHeight(mItemHeight);
-        widget->setMaximumHeight(mItemHeight * mRowsPerItem);
-    }
-
-    if (mItemWidth > 0)
-    {
-        widget->setMinimumWidth(mItemWidth);
-        widget->setMaximumWidth(mItemWidth);
-    }
-}
-
 QTreeWidgetItem* CustomSettingTreeWidget::add(Setting* setting, const QStringList& styles, const QIcon &icon)
 {
     return add(setting, nullptr, icon, styles);
 }
 
+void CustomSettingTreeWidget::setItemsHeight(int height)
+{
+    mItemHeight = height;
+}
+
+void CustomSettingTreeWidget::setItemsWidth(int width)
+{
+    mItemWidth = width;
+}
+
+void CustomSettingTreeWidget::setItemsRowsCount(int count)
+{
+    mItemsRowsCount = count;
+}
+
+void CustomSettingTreeWidget::setItemsSizeHint(int item_width, int item_height, int item_rows_count)
+{
+    mItemHeight     = item_width;
+    mItemWidth      = item_height;
+    mItemsRowsCount = item_rows_count;
+}
+
+void CustomSettingTreeWidget::applySizeHint(int item_width, int item_height, int item_rows_count)
+{
+    setItemsSizeHint(item_width, item_height, item_rows_count);
+    if (item_height > 0)
+    {
+        setMinimumHeight(item_height);
+        setMaximumHeight(item_height * item_rows_count);
+    }
+
+    if (item_width > 0)
+    {
+        setFixedWidth(item_width);
+    }
+}
 QWidget* CustomSettingTreeWidget::createCustomWidget(Setting* setting)
 {
     auto widget = new CustomSettingWidget(setting, this);
-    setSizeHint(widget);
+    widget->setSizeHint(mItemWidth, mItemHeight, mItemsRowsCount);
 
     return widget;
 }
@@ -111,12 +132,9 @@ QWidget* CustomSettingTreeWidget::createCustomTreeWidget(Setting* setting)
 {
     auto widget = new CustomSettingTreeWidget(setting, this);
 
-    widget->setItemHeight(mItemHeight);
-    widget->setItemWidth(mItemWidth);
-    widget->setRowsPerItem(mRowsPerItem);
     widget->setOneClickMode(mIsOneClickMode);
     widget->setAlternatingRowColors(alternatingRowColors());
-    setSizeHint(widget);
+    widget->applySizeHint(mItemWidth, mItemHeight, mItemsRowsCount);
 
     return widget;
 }

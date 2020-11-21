@@ -28,7 +28,7 @@ QVariant ItemTreeModel::data(const QModelIndex &index, int role) const
 
     Item *item = getItem(index);
 
-    if(item == 0)
+    if(!item)
         return QVariant();
 
     return QVariant().fromValue(item);
@@ -79,30 +79,32 @@ Qt::ItemFlags ItemTreeModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return {};
+
     Qt::ItemFlags flags = QAbstractItemModel::flags(index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | mFlags;
 
-    //Item* item = getItem(index);
-    //flags |= item->getProperty(index.column()).mFlags;
+    auto setting = getSetting(index);
+    if(setting && !setting->isReadOnly())
+        flags |= Qt::ItemIsEditable;
 
     return flags;
 }
 
 Item* ItemTreeModel::getItem(const QModelIndex &index) const
 {
-    if(mRootItem == 0)
-        return 0;
-
-    if (!index.isValid())
+    if (!mRootItem || !index.isValid())
         return mRootItem;
 
-    Item *item = static_cast<Item*>(index.internalPointer());
-
-    if (item)
-        return item;
-    else
-        return 0;
+    return static_cast<Item*>(index.internalPointer());
 }
 
+Setting *ItemTreeModel::getSetting(const QModelIndex &index) const
+{
+    if(!index.isValid())
+        return nullptr;
+
+    auto item = getItem(index);
+    return item ? item->getSetting(index.column()) : nullptr;
+}
 
 Item* ItemTreeModel::getRootItem() const
 {
@@ -112,20 +114,16 @@ Item* ItemTreeModel::getRootItem() const
 QModelIndex ItemTreeModel::index(int row, int column, const QModelIndex &parent) const
 {
 
-    if (parent.isValid() && parent.column() != 0)
+    if(parent.isValid() && parent.column() != 0)
         return QModelIndex();
 
-    Item *mParent = getItem(parent);
+    auto mParent = getItem(parent);
 
     if(!mParent)
         return QModelIndex();
 
-    Item *childItem = mParent->getItem(row);
-
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
+    auto childItem = mParent->getItem(row);
+    return childItem ? createIndex(row, column, childItem) : QModelIndex();
 }
 
 QModelIndex ItemTreeModel::parent(const QModelIndex &index) const
@@ -134,12 +132,12 @@ QModelIndex ItemTreeModel::parent(const QModelIndex &index) const
     if (!index.isValid())
         return QModelIndex();
 
-    Item *childItem = getItem(index);
+    auto childItem = getItem(index);
 
     if(childItem == 0)
         return QModelIndex();
 
-    Item *mParent = dynamic_cast<Item*>(childItem->parent());
+    auto mParent = dynamic_cast<Item*>(childItem->parent());
 
     if (mParent == mRootItem)
         return QModelIndex();
@@ -149,11 +147,8 @@ QModelIndex ItemTreeModel::parent(const QModelIndex &index) const
 
 int ItemTreeModel::rowCount(const QModelIndex &parent) const
 {
-    Item *mParent = getItem(parent);
-    if(mParent !=0)
-        return mParent->getItems().count();
-    else
-        return 0;
+    auto mParent = getItem(parent);
+    return mParent ? mParent->getItems().count() : 0;
 }
 void ItemTreeModel::updateItems(Item* items)
 {
@@ -164,9 +159,11 @@ void ItemTreeModel::updateItems(Item* items)
 void ItemTreeModel::setItems(Item* items)
 {
     beginResetModel();
+
     if(mRootItem != nullptr )
         delete mRootItem;
     mRootItem = items;
+
     endResetModel();
 }
 

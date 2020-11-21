@@ -26,8 +26,9 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
-    Item *getItem(const QModelIndex &index) const;
-    Item *getRootItem()const;
+    Item* getItem(const QModelIndex &index) const;
+    Setting* getSetting(const QModelIndex &index) const;
+    Item* getRootItem()const;
     void setItems(Item* items);
     void updateItems(Item* items);
     void setHeaders(const QStringList& headers);

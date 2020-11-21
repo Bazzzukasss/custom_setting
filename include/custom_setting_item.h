@@ -17,7 +17,8 @@ public:
     void addItems(const List &items);
     inline const List& getItems() const { return mItems; }
 
-    Item* getItem(int index){ return mItems.at(index); }
+    Item* getItem(int index) { return 0 <= index && index < mItems.size() ? mItems.at(index) : nullptr; }
+    Setting* getSetting(int index) { return 1 <= index && index <= mSettings.size() ? mSettings.at(index - 1) : nullptr; }
     int getNumber() const;
 
 

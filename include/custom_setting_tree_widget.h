@@ -8,9 +8,9 @@ class CustomSettingTreeWidget : public QTreeWidget
 {
     Q_OBJECT
 
-    const int kDefaultItemHeight{26};
-    const int kDefaultItemWidth{100};
-    const int kDefaultRowsPerItem{8};
+    static const int kDefaultItemHeight{26};
+    static const int kDefaultItemWidth{100};
+    static const int kDefaultRowsPerItem{4};
 
  public:
     explicit CustomSettingTreeWidget(QWidget* parent = nullptr);
@@ -19,11 +19,13 @@ class CustomSettingTreeWidget : public QTreeWidget
     QTreeWidgetItem* add(custom_setting::Setting* setting, const QStringList& styles = {},
                                 const QIcon& icon = {});
 
-    inline void setItemHeight(int height) { mItemHeight = height; }
-    inline void setItemWidth(int width) { mItemWidth = width; }
-    inline void setRowsPerItem(int count) { mRowsPerItem = count; }
     inline void showItemTooltip(bool is_visible) { mShowTooltips = is_visible; }
     inline void setOneClickMode(bool is_enable) { mIsOneClickMode = is_enable; }
+
+    void setItemsHeight(int height);
+    void setItemsWidth(int width);
+    void setItemsRowsCount(int count);
+    void setItemsSizeHint(int item_width, int item_height, int item_rows_count);
 
  private:
     void createCaptionWidget(custom_setting::Setting* setting, QTreeWidgetItem *sub_item, const QString& style);
@@ -40,12 +42,12 @@ class CustomSettingTreeWidget : public QTreeWidget
     QTreeWidgetItem* add(custom_setting::Setting* setting, QTreeWidgetItem* item,
                                 const QIcon &icon, const QStringList& styles);
 
-    void setSizeHint(QWidget *widget);
+    void applySizeHint(int item_width, int item_height, int item_rows_count);
 
     int mTreeLevel{0};
     int mItemHeight{kDefaultItemHeight};
     int mItemWidth{kDefaultItemWidth};
-    int mRowsPerItem{kDefaultRowsPerItem};
+    int mItemsRowsCount{kDefaultRowsPerItem};
     bool mShowTooltips{true};
     bool mIsOneClickMode{false};
 };

@@ -174,7 +174,7 @@ void CustomLineEdit::update()
     if (mSetting != nullptr)
     {
         blockSignals(true);
-        setText(fontMetrics().elidedText(mSetting->getData().value, Qt::ElideRight, width()));
+        setText(mSetting->getData().value);
         blockSignals(false);
 
         emit signalStateChanged();
@@ -279,8 +279,6 @@ void CustomColorButton::update()
     if (mSetting != nullptr)
     {
         setStyleSheet(QString("background-color: %1;").arg(mSetting->getData().value.name()));
-        setText("Color");
-
         emit signalStateChanged();
     }
 }
@@ -486,7 +484,7 @@ void CustomLabel::update()
 
     if(boolSetting)
     {
-        setText(boolSetting ? "Yes" : "No");
+        setText(boolSetting->getData().value ? "Yes" : "No");
     }
     else if(intSetting)
     {
