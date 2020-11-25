@@ -122,7 +122,8 @@ void CustomSettingTreeWidget::applySizeHint(int item_width, int item_height, int
 }
 QWidget* CustomSettingTreeWidget::createCustomWidget(Setting* setting)
 {
-    auto widget = new CustomSettingWidget(setting, this);
+    auto widget = new CustomSettingWidget(this);
+    widget->bindToSetting(setting);
     widget->setSizeHint(mItemWidth, mItemHeight, mItemsRowsCount);
 
     return widget;
@@ -131,7 +132,6 @@ QWidget* CustomSettingTreeWidget::createCustomWidget(Setting* setting)
 QWidget* CustomSettingTreeWidget::createCustomTreeWidget(Setting* setting)
 {
     auto widget = new CustomSettingTreeWidget(setting, this);
-
     widget->setOneClickMode(mIsOneClickMode);
     widget->setAlternatingRowColors(alternatingRowColors());
     widget->applySizeHint(mItemWidth, mItemHeight, mItemsRowsCount);

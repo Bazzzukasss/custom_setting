@@ -31,6 +31,7 @@
         void bindToSetting(SettingType* setting); \
 \
         Q_SIGNAL void signalStateChanged(); \
+        Q_SIGNAL void signalEditingFinished(); \
 \
      protected: \
         void wheelEvent(QWheelEvent*) override { return; } \

@@ -1,20 +1,17 @@
 #include "custom_setting_widget.h"
 #include "ui_custom_setting_widget.h"
+#include "custom_setting.h"
 
 using namespace custom_setting;
 
-CustomSettingWidget::CustomSettingWidget(QWidget *parent) :
-    CustomSettingWidget(nullptr, parent)
-{    
-}
-
-CustomSettingWidget::CustomSettingWidget(Setting* setting, QWidget *parent) :
+CustomSettingWidget::CustomSettingWidget( QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CustomSettingWidget)
 {
     ui->setupUi(this);
 
-    bindToSetting(setting);
+    hideAll();
+    ui->mLabel->setVisible(true);
 }
 
 CustomSettingWidget::~CustomSettingWidget()
@@ -25,11 +22,11 @@ CustomSettingWidget::~CustomSettingWidget()
 void CustomSettingWidget::bindToSetting(custom_setting::Setting *setting)
 {
 #define BIND_SETTING(widget_type, custom_widget, custom_setting) \
-    ui->custom_widget->setVisible(custom_setting);\
     if (custom_setting)\
     {\
+        ui->custom_widget->setVisible(true);\
         ui->custom_widget->bindToSetting(custom_setting);\
-        connect(ui->custom_widget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalStateChanged);\
+        connect(ui->custom_widget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalEditingFinished);\
         return;\
     }
 
@@ -78,6 +75,64 @@ void CustomSettingWidget::bindToSetting(custom_setting::Setting *setting)
     }
 }
 
+void CustomSettingWidget::setSetting(Setting *setting)
+{
+#define SET_SETTING(widget_type, custom_widget, setting_type, custom_setting) \
+    if(custom_setting) \
+    { \
+        auto tmpSetting = new setting_type(*custom_setting, this); \
+        mSetting = tmpSetting; \
+        if(setting->isReadOnly() || mIsReadOnly) \
+        { \
+            ui->mLabel->clear(); \
+            ui->mLabel->setStyleSheet(""); \
+            ui->mLabel->bindToSetting(tmpSetting); \
+            ui->mLabel->setVisible(true); \
+        } \
+        else \
+        { \
+            ui->custom_widget->setVisible(true); \
+            ui->custom_widget->bindToSetting(tmpSetting); \
+            connect(ui->custom_widget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalEditingFinished); \
+        } \
+        return; \
+    }
+
+    hideAll();
+
+    if(!setting)
+    {
+        ui->mLabel->clear();
+        ui->mLabel->setStyleSheet("");
+        ui->mLabel->setVisible(true);
+        return;
+    }
+
+    setToolTip(setting->getDescription());
+
+        auto boolSetting            = dynamic_cast<SettingBool*>(setting);
+        auto intSetting             = dynamic_cast<SettingInt*>(setting);
+        auto doubleSetting          = dynamic_cast<SettingDouble*>(setting);
+        auto stringSetting          = dynamic_cast<SettingString*>(setting);
+        auto listSetting            = dynamic_cast<SettingStringList*>(setting);
+        auto fontSetting            = dynamic_cast<SettingFont*>(setting);
+        auto colorSetting           = dynamic_cast<SettingColor*>(setting);
+        auto sourceSetting          = dynamic_cast<SettingSource*>(setting);
+        auto editableListSetting    = dynamic_cast<SettingEditableList*>(setting);
+        auto changeableListSetting  = dynamic_cast<SettingChangeableList*>(setting);
+
+        SET_SETTING(CustomCheckBox, mCheckBox, SettingBool, boolSetting)
+        SET_SETTING(CustomSpinBox, mSpinBox, SettingInt, intSetting)
+        SET_SETTING(CustomDoubleSpinBox, mDoubleSpinBox, SettingDouble, doubleSetting)
+        SET_SETTING(CustomLineEdit, mLineEdit, SettingString, stringSetting)
+        SET_SETTING(CustomComboBox, mComboBox, SettingStringList, listSetting)
+        SET_SETTING(CustomFontButton, mFontButton, SettingFont, fontSetting)
+        SET_SETTING(CustomColorButton, mColorButton, SettingColor, colorSetting)
+        SET_SETTING(CustomSourceButton, mSourceButton, SettingSource, sourceSetting)
+        SET_SETTING(CustomListBox, mListBox, SettingChangeableList, changeableListSetting)
+        SET_SETTING(CustomTextEdit, mTextEdit, SettingEditableList, editableListSetting)
+}
+
 void CustomSettingWidget::setReadOnly(bool is_read_only)
 {
     mIsReadOnly = is_read_only;
@@ -112,6 +167,11 @@ void CustomSettingWidget::setSizeHint(int item_width, int item_height, int item_
 void CustomSettingWidget::setText(const QString &text)
 {
     ui->mLabel->setText(text);
+}
+
+const Setting* CustomSettingWidget::getSetting() const
+{
+    return mSetting;
 }
 
 void CustomSettingWidget::hideAll()

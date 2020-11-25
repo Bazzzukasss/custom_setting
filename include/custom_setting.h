@@ -33,19 +33,18 @@ class Setting : public QObject
     inline const Vec& getSettings() const { return mSettings; }
     inline bool isReadOnly() const { return mReadOnly; }
     virtual bool isAnyChecked() const;    
+    virtual QVariant getValue() const { return {}; }
+    virtual QVariant getDefaultValue() const { return {}; }
 
     /*Setters*/
     inline void setDescription(const QString& description) { mDescription = description; }
+    virtual void setValue(const QVariant&) {}
 
 signals:
     void signalDataChanged(const QVariant&);
 
  protected:
     inline void emitSignalDataChanged() { emit signalDataChanged(getValue()); }
-
-    virtual void setValue(const QVariant&) {}
-    virtual QVariant getValue() const { return {}; }
-    virtual QVariant getDefaultValue() const { return {}; }
 
     Vec mSettings;
     QString mKey;
@@ -73,6 +72,7 @@ class SettingExt : public Setting
  public:
     SettingExt(const QString& key, const QString& caption, const QString& description, const T& data = {},
                      bool read_only = false, QObject* parent = nullptr);
+    SettingExt(const SettingExt<T>& setting, QObject* parent = nullptr);
 
     void setData(const T& data) { mData = data; }
     T& getData() { return mData; }
@@ -83,6 +83,7 @@ class SettingExt : public Setting
 
     operator DataValueType() const;
     SettingExt<T>& operator=(const DataValueType& value);
+    SettingExt<T>& operator=(const SettingExt<T>& setting);
 
  protected:
     void setValue(const QVariant& variant) override { setDataValue(variant.value<DataValueType>()); }
@@ -100,6 +101,12 @@ SettingExt<T>::SettingExt(const QString& key, const QString& caption, const QStr
     mData(data)
 {}
 
+template<typename T>
+SettingExt<T>::SettingExt(const SettingExt<T> &setting, QObject* parent) :
+    Setting(setting.mKey, setting.mCaption, setting.mDescription, setting.mReadOnly, parent),
+    mData(setting.mData)
+{}
+
 template <typename T>
 void SettingExt<T>::setDataValue(SettingExt<T>::DataValueType value)
 {
@@ -114,6 +121,17 @@ template <typename T>
 SettingExt<T>& SettingExt<T>::operator=(const SettingExt::DataValueType& value)
 {
     setDataValue(value);
+    return *this;
+}
+
+template <typename T>
+SettingExt<T>& SettingExt<T>::operator=(const SettingExt<T>& setting)
+{
+    mKey = setting.mKey;
+    mCaption = setting.mCaption;
+    mDescription = setting.mDescription;
+    mReadOnly = setting.mReadOnly;
+    setDataValue(setting.mData);
     return *this;
 }
 

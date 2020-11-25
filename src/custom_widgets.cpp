@@ -27,7 +27,10 @@ void CustomSpinBox::bindToSetting(CustomSpinBox::SettingType* setting)
             setButtonSymbols(ButtonSymbols::NoButtons);
         }
 
-        connect(this, &CustomSpinBox::editingFinished, this, [&]() { mSetting->setDataValue(value()); });
+        connect(this, &CustomSpinBox::editingFinished, this, [&]() {
+            mSetting->setDataValue(value());
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomSpinBox::update);
 
         update();
@@ -58,7 +61,10 @@ void CustomSlider::bindToSetting(CustomSlider::SettingType* setting)
         setMaximum(mSetting->getData().maximum);
         setEnabled(!mSetting->isReadOnly());
 
-        connect(this, &CustomSlider::valueChanged, this, [&]() { mSetting->setDataValue(value()); });
+        connect(this, &CustomSlider::valueChanged, this, [&]() {
+            mSetting->setDataValue(value());
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomSlider::update);
 
         update();
@@ -95,7 +101,10 @@ void CustomDoubleSpinBox::bindToSetting(CustomDoubleSpinBox::SettingType* settin
             setButtonSymbols(ButtonSymbols::NoButtons);
         }
 
-        connect(this, &CustomDoubleSpinBox::editingFinished, this, [&]() { mSetting->setDataValue(value()); });
+        connect(this, &CustomDoubleSpinBox::editingFinished, this, [&]() {
+            mSetting->setDataValue(value());
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomDoubleSpinBox::update);
 
         update();
@@ -115,9 +124,7 @@ void CustomDoubleSpinBox::update()
 }
 
 CustomCheckBox::CustomCheckBox(QWidget* parent) : QCheckBox(parent), mSetting(nullptr)
-{
-    connect(this, &CustomCheckBox::stateChanged, this, &CustomCheckBox::signalStateChanged);
-}
+{}
 
 void CustomCheckBox::bindToSetting(CustomCheckBox::SettingType* setting)
 {
@@ -126,7 +133,10 @@ void CustomCheckBox::bindToSetting(CustomCheckBox::SettingType* setting)
         mSetting = setting;
         setEnabled(!mSetting->isReadOnly());
 
-        connect(this, &CustomCheckBox::stateChanged, this, [&]() { mSetting->setDataValue(isChecked()); });
+        connect(this, &CustomCheckBox::stateChanged, this, [&]() {
+            mSetting->setDataValue(isChecked());
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomCheckBox::update);
         update();
     }
@@ -163,7 +173,10 @@ void CustomLineEdit::bindToSetting(CustomLineEdit::SettingType* setting)
             setValidator(validator);
         }
 
-        connect(this, &CustomLineEdit::editingFinished, this, [&]() { mSetting->setDataValue(text()); });
+        connect(this, &CustomLineEdit::editingFinished, this, [&]() {
+            mSetting->setDataValue(text());
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomLineEdit::update);
         update();
     }
@@ -191,7 +204,10 @@ void CustomComboBox::bindToSetting(CustomComboBox::SettingType* setting)
         mSetting = setting;
         setEnabled(!mSetting->isReadOnly());
 
-        connect(this, &CustomComboBox::currentTextChanged, this, [&]() { mSetting->setDataValue(currentText()); });
+        connect(this, &CustomComboBox::currentTextChanged, this, [&]() {
+            mSetting->setDataValue(currentText());
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomComboBox::update);
         update();
     }
@@ -233,6 +249,7 @@ void CustomFontButton::bindToSetting(CustomFontButton::SettingType* setting)
             {
                 mSetting->setDataValue(fnt);
             }
+            emit signalEditingFinished();
         });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomFontButton::update);
         update();
@@ -268,6 +285,7 @@ void CustomColorButton::bindToSetting(CustomColorButton::SettingType* setting)
             {
                 mSetting->setDataValue(clr);
             }
+            emit signalEditingFinished();
         });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomColorButton::update);
         update();
@@ -314,6 +332,7 @@ void CustomSourceButton::bindToSetting(CustomSourceButton::SettingType* setting)
             {
                 mSetting->setDataValue(filename);
             }
+            emit signalEditingFinished();
         });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomSourceButton::update);
         update();
@@ -340,7 +359,10 @@ void CustomTextEdit::bindToSetting(CustomTextEdit::SettingType* setting)
         mSetting = setting;
         setReadOnly(mSetting->isReadOnly());
 
-        connect(this, &CustomTextEdit::textChanged, this, [&]() { mSetting->setDataValue(toPlainText().split("\n")); });
+        connect(this, &CustomTextEdit::textChanged, this, [&]() {
+            mSetting->setDataValue(toPlainText().split("\n"));
+            emit signalEditingFinished();
+        });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomTextEdit::update);
         update();
     }
@@ -424,6 +446,7 @@ void CustomListBox::bindToSetting(CustomListBox::SettingType* setting)
             }
 
             mSetting->setDataValue(list);
+            emit signalEditingFinished();
         });
         connect(mSetting, &Setting::signalDataChanged, this, &CustomListBox::update);
         update();

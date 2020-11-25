@@ -167,6 +167,22 @@ void ItemTreeModel::setItems(Item* items)
     endResetModel();
 }
 
+void ItemTreeModel::setSetting(const QModelIndex &index, const Setting *setting)
+{
+    if(index.isValid() && setting)
+    {
+        auto item = getItem(index);
+        if(item)
+        {
+            auto itemSetting = item->getSetting(index.column());
+            if(itemSetting)
+            {
+                itemSetting->setValue(setting->getValue());
+            }
+        }
+    }
+}
+
 void ItemTreeModel::setHeaders(const QStringList &headers)
 {
 	

@@ -43,7 +43,8 @@ private:
     int mItemWidth{kDefaultItemWidth};
     int mItemsRowsCount{kDefaultRowsPerItem};
 
-    Setting *getSetting(const QModelIndex &index) const;    
+    void setSetting(QAbstractItemModel *model, const QModelIndex &index, const Setting* setting) const;
+    Setting *getSetting(const QModelIndex &index) const;
     Item* getItem(const QModelIndex &index) const;
 };
 }

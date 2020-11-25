@@ -81,30 +81,37 @@ QSize Delegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &
 
 QWidget *Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
-    auto setting = getSetting(index);
-    CustomSettingWidget* pEditor = new CustomSettingWidget(setting, parent);
+    CustomSettingWidget* pEditor = new CustomSettingWidget(parent);
     pEditor->setSizeHint(mItemWidth, mItemHeight, mItemsRowsCount);
-    connect(pEditor, &CustomSettingWidget::signalStateChanged, this, &Delegate::slotCommit);
+    pEditor->setReadOnly(false);
+    connect(pEditor, &CustomSettingWidget::signalEditingFinished, this, &Delegate::slotCommit);
+
     return pEditor;
 }
 
 void Delegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     auto pEditor = qobject_cast<CustomSettingWidget*>(editor);
-    pEditor->setReadOnly(false);
+    pEditor->setSetting(getSetting(index));
 }
 
 void Delegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    //CustomItemWidget* pEditor=qobject_cast<CustomItemWidget*>(editor);
-    //model->setData(index,QVariant().fromValue(pEditor->getData()));
+    auto pEditor = qobject_cast<CustomSettingWidget*>(editor);
+    setSetting(model, index, pEditor->getSetting());
+    //model->setData(index, QVariant().fromValue(pEditor->getSetting()));
 }
 
 void Delegate::slotCommit()
 {
-    QWidget* pEditor=qobject_cast<QWidget*>(sender());
+    QWidget* pEditor = qobject_cast<QWidget*>(sender());
     emit commitData(pEditor);
     emit closeEditor(pEditor);
+}
+
+void Delegate::setSetting(QAbstractItemModel *model, const QModelIndex &index, const Setting *setting) const
+{
+    return dynamic_cast<ItemTreeModel*>(model)->setSetting(index, setting);
 }
 
 Setting *Delegate::getSetting(const QModelIndex &index) const
