@@ -1,53 +1,52 @@
+#include <QVBoxLayout>
 #include "custom_setting_widget.h"
-#include "ui_custom_setting_widget.h"
 #include "custom_setting.h"
+#include "custom_widgets.h"
 
 using namespace custom_setting;
 
-CustomSettingWidget::CustomSettingWidget( QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CustomSettingWidget)
+CustomSettingWidget::CustomSettingWidget(QWidget *parent) :
+    QWidget(parent)
 {
-    ui->setupUi(this);
-
-    hideAll();
-    ui->mLabel->setVisible(true);
+    mLayout = new QVBoxLayout(this);
+    mLayout->setSpacing(0);
+    mLayout->setMargin(0);
+    mLayout->addStretch();
 }
 
 CustomSettingWidget::~CustomSettingWidget()
 {
-    delete ui;
+    clear();
 }
 
 void CustomSettingWidget::bindToSetting(custom_setting::Setting *setting)
 {
-#define BIND_SETTING(widget_type, custom_widget, custom_setting) \
+#define BIND_SETTING(widget_type, custom_setting) \
     if (custom_setting)\
     {\
-        ui->custom_widget->setVisible(true);\
-        ui->custom_widget->bindToSetting(custom_setting);\
-        connect(ui->custom_widget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalEditingFinished);\
+        auto customWidget = new widget_type;\
+        mWidget = customWidget;\
+        customWidget->bindToSetting(custom_setting);\
+        connect(customWidget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalEditingFinished);\
+        mLayout->insertWidget(0, mWidget); \
+        applySizeHint();\
         return;\
     }
 
-    hideAll();
+    clear();
 
     if(!setting)
-    {
-        ui->mLabel->clear();
-        ui->mLabel->setStyleSheet("");
-        ui->mLabel->setVisible(true);
         return;
-    }
 
     setToolTip(setting->getDescription());
 
     if(setting->isReadOnly() || mIsReadOnly)
     {
-        ui->mLabel->clear();
-        ui->mLabel->setStyleSheet("");
-        ui->mLabel->bindToSetting(setting);
-        ui->mLabel->setVisible(true);
+        auto customWidget = new CustomLabel;
+        customWidget->bindToSetting(setting);
+        mWidget = customWidget;
+        mLayout->insertWidget(0, mWidget);
+        applySizeHint();
     }
     else
     {
@@ -62,75 +61,72 @@ void CustomSettingWidget::bindToSetting(custom_setting::Setting *setting)
         auto editableListSetting    = dynamic_cast<SettingEditableList*>(setting);
         auto changeableListSetting  = dynamic_cast<SettingChangeableList*>(setting);
 
-        BIND_SETTING(CustomCheckBox, mCheckBox, boolSetting)
-        BIND_SETTING(CustomSpinBox, mSpinBox, intSetting)
-        BIND_SETTING(CustomDoubleSpinBox, mDoubleSpinBox, doubleSetting)
-        BIND_SETTING(CustomLineEdit, mLineEdit, stringSetting)
-        BIND_SETTING(CustomComboBox, mComboBox, listSetting)
-        BIND_SETTING(CustomFontButton, mFontButton, fontSetting)
-        BIND_SETTING(CustomColorButton, mColorButton, colorSetting)
-        BIND_SETTING(CustomSourceButton, mSourceButton, sourceSetting)
-        BIND_SETTING(CustomListBox, mListBox, changeableListSetting)
-        BIND_SETTING(CustomTextEdit, mTextEdit, editableListSetting)
+        BIND_SETTING(CustomCheckBox, boolSetting)
+        BIND_SETTING(CustomSpinBox, intSetting)
+        BIND_SETTING(CustomDoubleSpinBox, doubleSetting)
+        BIND_SETTING(CustomLineEdit, stringSetting)
+        BIND_SETTING(CustomComboBox, listSetting)
+        BIND_SETTING(CustomFontButton, fontSetting)
+        BIND_SETTING(CustomColorButton, colorSetting)
+        BIND_SETTING(CustomSourceButton, sourceSetting)
+        BIND_SETTING(CustomListBox, changeableListSetting)
+        BIND_SETTING(CustomTextEdit, editableListSetting)
     }
 }
 
 void CustomSettingWidget::setSetting(Setting *setting)
 {
-#define SET_SETTING(widget_type, custom_widget, setting_type, custom_setting) \
+#define SET_SETTING(widget_type, setting_type, custom_setting) \
     if(custom_setting) \
     { \
         auto tmpSetting = new setting_type(*custom_setting, this); \
         mSetting = tmpSetting; \
         if(setting->isReadOnly() || mIsReadOnly) \
         { \
-            ui->mLabel->clear(); \
-            ui->mLabel->setStyleSheet(""); \
-            ui->mLabel->bindToSetting(tmpSetting); \
-            ui->mLabel->setVisible(true); \
+            auto customWidget = new CustomLabel; \
+            customWidget->bindToSetting(tmpSetting); \
+            mWidget = customWidget; \
         } \
         else \
         { \
-            ui->custom_widget->setVisible(true); \
-            ui->custom_widget->bindToSetting(tmpSetting); \
-            connect(ui->custom_widget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalEditingFinished); \
+            auto customWidget = new widget_type; \
+            customWidget->bindToSetting(tmpSetting); \
+            connect(customWidget, &widget_type::signalStateChanged, this, &CustomSettingWidget::signalEditingFinished); \
+            mWidget = customWidget; \
         } \
+        mLayout->insertWidget(0, mWidget); \
+        applySizeHint(); \
         return; \
     }
 
-    hideAll();
+    clear();
 
     if(!setting)
-    {
-        ui->mLabel->clear();
-        ui->mLabel->setStyleSheet("");
-        ui->mLabel->setVisible(true);
         return;
-    }
 
     setToolTip(setting->getDescription());
 
-        auto boolSetting            = dynamic_cast<SettingBool*>(setting);
-        auto intSetting             = dynamic_cast<SettingInt*>(setting);
-        auto doubleSetting          = dynamic_cast<SettingDouble*>(setting);
-        auto stringSetting          = dynamic_cast<SettingString*>(setting);
-        auto listSetting            = dynamic_cast<SettingStringList*>(setting);
-        auto fontSetting            = dynamic_cast<SettingFont*>(setting);
-        auto colorSetting           = dynamic_cast<SettingColor*>(setting);
-        auto sourceSetting          = dynamic_cast<SettingSource*>(setting);
-        auto editableListSetting    = dynamic_cast<SettingEditableList*>(setting);
-        auto changeableListSetting  = dynamic_cast<SettingChangeableList*>(setting);
+    auto boolSetting            = dynamic_cast<SettingBool*>(setting);
+    auto intSetting             = dynamic_cast<SettingInt*>(setting);
+    auto doubleSetting          = dynamic_cast<SettingDouble*>(setting);
+    auto stringSetting          = dynamic_cast<SettingString*>(setting);
+    auto listSetting            = dynamic_cast<SettingStringList*>(setting);
+    auto fontSetting            = dynamic_cast<SettingFont*>(setting);
+    auto colorSetting           = dynamic_cast<SettingColor*>(setting);
+    auto sourceSetting          = dynamic_cast<SettingSource*>(setting);
+    auto editableListSetting    = dynamic_cast<SettingEditableList*>(setting);
+    auto changeableListSetting  = dynamic_cast<SettingChangeableList*>(setting);
 
-        SET_SETTING(CustomCheckBox, mCheckBox, SettingBool, boolSetting)
-        SET_SETTING(CustomSpinBox, mSpinBox, SettingInt, intSetting)
-        SET_SETTING(CustomDoubleSpinBox, mDoubleSpinBox, SettingDouble, doubleSetting)
-        SET_SETTING(CustomLineEdit, mLineEdit, SettingString, stringSetting)
-        SET_SETTING(CustomComboBox, mComboBox, SettingStringList, listSetting)
-        SET_SETTING(CustomFontButton, mFontButton, SettingFont, fontSetting)
-        SET_SETTING(CustomColorButton, mColorButton, SettingColor, colorSetting)
-        SET_SETTING(CustomSourceButton, mSourceButton, SettingSource, sourceSetting)
-        SET_SETTING(CustomListBox, mListBox, SettingChangeableList, changeableListSetting)
-        SET_SETTING(CustomTextEdit, mTextEdit, SettingEditableList, editableListSetting)
+    SET_SETTING(CustomCheckBox, SettingBool, boolSetting)
+    SET_SETTING(CustomSpinBox, SettingInt, intSetting)
+    SET_SETTING(CustomDoubleSpinBox, SettingDouble, doubleSetting)
+    SET_SETTING(CustomLineEdit, SettingString, stringSetting)
+    SET_SETTING(CustomComboBox, SettingStringList, listSetting)
+    SET_SETTING(CustomFontButton, SettingFont, fontSetting)
+    SET_SETTING(CustomColorButton, SettingColor, colorSetting)
+    SET_SETTING(CustomSourceButton, SettingSource, sourceSetting)
+    SET_SETTING(CustomListBox, SettingChangeableList, changeableListSetting)
+    SET_SETTING(CustomTextEdit, SettingEditableList, editableListSetting)
 }
 
 void CustomSettingWidget::setReadOnly(bool is_read_only)
@@ -140,33 +136,11 @@ void CustomSettingWidget::setReadOnly(bool is_read_only)
 
 void CustomSettingWidget::setSizeHint(int item_width, int item_height, int item_rows_count)
 {
-    if (item_height > 0)
-    {
-        setMinimumHeight(item_height);
-        setMaximumHeight(item_height * item_rows_count);
-    }
+    mItemHeight = item_height;
+    mItemWidth = item_width;
+    mItemsRowsCount = item_rows_count;
 
-    if (item_width > 0)
-    {
-        setFixedWidth(item_width);
-    }
-
-    for(auto child : children())
-    {
-        auto widget = qobject_cast<QWidget*>(child);
-        if(widget)
-        {
-            widget->setMinimumWidth(minimumWidth());
-            widget->setMaximumWidth(maximumWidth());
-            widget->setMinimumHeight(minimumHeight());
-            widget->setMaximumHeight(maximumHeight());
-        }
-    }
-}
-
-void CustomSettingWidget::setText(const QString &text)
-{
-    ui->mLabel->setText(text);
+    applySizeHint();
 }
 
 const Setting* CustomSettingWidget::getSetting() const
@@ -174,13 +148,36 @@ const Setting* CustomSettingWidget::getSetting() const
     return mSetting;
 }
 
-void CustomSettingWidget::hideAll()
+void CustomSettingWidget::clear()
 {
-    for(auto w : children())
+    if(mSetting)
+        delete mSetting;
+
+    if(mWidget)
     {
-        if(w != ui->verticalLayout)
-        {
-            qobject_cast<QWidget*>(w)->setVisible(false);
-        }
+        mLayout->removeWidget(mWidget);
+        delete mWidget;
+    }
+}
+
+void CustomSettingWidget::applySizeHint()
+{
+    if (mItemHeight > 0)
+    {
+        setMinimumHeight(mItemHeight);
+        setMaximumHeight(mItemHeight * mItemsRowsCount);
+    }
+
+    if (mItemWidth > 0)
+    {
+        setFixedWidth(mItemWidth);
+    }
+
+    if(mWidget)
+    {
+        mWidget->setMinimumWidth(minimumWidth());
+        mWidget->setMaximumWidth(maximumWidth());
+        mWidget->setMinimumHeight(minimumHeight());
+        mWidget->setMaximumHeight(maximumHeight());
     }
 }

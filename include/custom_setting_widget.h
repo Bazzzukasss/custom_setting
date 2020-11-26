@@ -2,12 +2,10 @@
 
 #include <QWidget>
 
+class QVBoxLayout;
+
 namespace custom_setting{
 class Setting;
-}
-
-namespace Ui {
-class CustomSettingWidget;
 }
 
 class CustomSettingWidget : public QWidget
@@ -22,7 +20,6 @@ public:
     void setSetting(custom_setting::Setting* setting);
     void setReadOnly(bool is_read_only);
     void setSizeHint(int item_width, int item_height, int item_rows_count);
-    void setText(const QString& text);
 
     const custom_setting::Setting* getSetting() const;
 
@@ -30,9 +27,14 @@ signals:
     void signalEditingFinished();
 
 private:
-    void hideAll();
-
-    Ui::CustomSettingWidget *ui;
     bool mIsReadOnly{false};
-    custom_setting::Setting* mSetting;
+    QWidget* mWidget{nullptr};
+    QVBoxLayout* mLayout{nullptr};
+    custom_setting::Setting* mSetting{nullptr};
+    int mItemHeight{-1};
+    int mItemWidth{-1};
+    int mItemsRowsCount{1};
+
+    void clear();
+    void applySizeHint();
 };

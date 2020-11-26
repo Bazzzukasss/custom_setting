@@ -15,9 +15,6 @@ Delegate::Delegate(QObject *parent)
 
 void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    bool isNeedRender{false};
-    CustomSettingWidget widget;
-
     if(!index.isValid())
         return;
 
@@ -28,8 +25,9 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
         auto item = getItem(index);
         if(item)
         {
-            widget.setText(item->getCaption());
-            isNeedRender = true;
+            auto rect = option.rect;
+            rect.adjust(6,6,6,6);
+            QApplication::style()->drawItemText(painter, rect, Qt::AlignLeft | Qt::AlignTop, QApplication::palette(), true, item->getCaption() );
         }
     }
     else
@@ -37,22 +35,18 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
         auto setting = getSetting(index);
         if(setting)
         {
+            CustomSettingWidget widget;
             widget.setReadOnly(true);
             widget.bindToSetting(setting);
-            isNeedRender = true;
+            widget.setSizeHint(mItemWidth, mItemHeight, mItemsRowsCount);
+            widget.setStyleSheet("background-color: transparent;");
+            widget.setFixedSize(option.rect.size());
+
+            QPixmap pixmap(widget.size());
+            pixmap.fill(Qt::transparent);
+            widget.render(&pixmap);
+            painter->drawPixmap(option.rect, pixmap);
         }
-    }
-
-    if(isNeedRender)
-    {
-        widget.setSizeHint(mItemWidth, mItemHeight, mItemsRowsCount);
-        widget.setStyleSheet("background-color: transparent;");
-        widget.setFixedSize(option.rect.size());
-
-        QPixmap pixmap(widget.size());
-        pixmap.fill(Qt::transparent);
-        widget.render(&pixmap);
-        painter->drawPixmap(option.rect, pixmap);
     }
 }
 
