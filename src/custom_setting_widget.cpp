@@ -143,9 +143,9 @@ void CustomSettingWidget::setSizeHint(int item_width, int item_height, int item_
     applySizeHint();
 }
 
-const Setting* CustomSettingWidget::getSetting() const
+QVariant CustomSettingWidget::getSettingValue() const
 {
-    return mSetting;
+    return mSetting ? mSetting->getValue() : QVariant();
 }
 
 void CustomSettingWidget::clear()

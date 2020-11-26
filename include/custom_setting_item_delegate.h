@@ -1,10 +1,6 @@
 #pragma once
 
 #include <QStyledItemDelegate>
-#include <QPointer>
-
-class CustomSettingWidget;
-class QLabel;
 
 namespace custom_setting {
 
@@ -42,9 +38,5 @@ private:
     int mItemHeight{kDefaultItemHeight};
     int mItemWidth{kDefaultItemWidth};
     int mItemsRowsCount{kDefaultRowsPerItem};
-
-    void setSetting(QAbstractItemModel *model, const QModelIndex &index, const Setting* setting) const;
-    Setting *getSetting(const QModelIndex &index) const;
-    Item* getItem(const QModelIndex &index) const;
 };
 }

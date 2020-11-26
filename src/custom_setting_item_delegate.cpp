@@ -18,21 +18,16 @@ void Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, cons
     if(!index.isValid())
         return;
 
-    QStyledItemDelegate::paint(painter, option, index);
-
     if(index.column() == 0)
     {
-        auto item = getItem(index);
-        if(item)
-        {
-            auto rect = option.rect;
-            rect.adjust(6,6,6,6);
-            QApplication::style()->drawItemText(painter, rect, Qt::AlignLeft | Qt::AlignTop, QApplication::palette(), true, item->getCaption() );
-        }
+        auto myOption = option;
+        myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
+        QStyledItemDelegate::paint(painter, myOption, index);
     }
     else
     {
-        auto setting = getSetting(index);
+        QStyledItemDelegate::paint(painter, option, index);
+        auto setting = index.data().value<Setting*>();
         if(setting)
         {
             CustomSettingWidget widget;
@@ -55,11 +50,10 @@ QSize Delegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &
     auto sHint = QStyledItemDelegate::sizeHint(option, index);
     if(index.isValid())
     {
-        auto setting = getSetting(index);
-
         if(mItemHeight > 0)
         {
             int heightHint;
+            auto setting = index.data().value<Setting*>();
             heightHint = dynamic_cast<SettingEditableList*>(setting) ? mItemHeight * mItemsRowsCount : mItemHeight;
             sHint.setHeight(heightHint);
         }
@@ -86,14 +80,14 @@ QWidget *Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, c
 void Delegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     auto pEditor = qobject_cast<CustomSettingWidget*>(editor);
-    pEditor->setSetting(getSetting(index));
+    auto setting = index.data().value<Setting*>();
+    pEditor->setSetting(setting);
 }
 
 void Delegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     auto pEditor = qobject_cast<CustomSettingWidget*>(editor);
-    setSetting(model, index, pEditor->getSetting());
-    //model->setData(index, QVariant().fromValue(pEditor->getSetting()));
+    model->setData(index, pEditor->getSettingValue());
 }
 
 void Delegate::slotCommit()
@@ -101,21 +95,6 @@ void Delegate::slotCommit()
     QWidget* pEditor = qobject_cast<QWidget*>(sender());
     emit commitData(pEditor);
     emit closeEditor(pEditor);
-}
-
-void Delegate::setSetting(QAbstractItemModel *model, const QModelIndex &index, const Setting *setting) const
-{
-    return dynamic_cast<ItemTreeModel*>(model)->setSetting(index, setting);
-}
-
-Setting *Delegate::getSetting(const QModelIndex &index) const
-{
-    return dynamic_cast<const ItemTreeModel*>(index.model())->getSetting(index);
-}
-
-Item *Delegate::getItem(const QModelIndex &index) const
-{
-    return dynamic_cast<const ItemTreeModel*>(index.model())->getItem(index);
 }
 
 void Delegate::setItemsHeight(int height)

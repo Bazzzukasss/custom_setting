@@ -27,17 +27,11 @@ public:
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
     void setItems(Item* items);
-    void setSetting(const QModelIndex &index, const Setting* setting);
+    void setSettingValue(const QModelIndex &index, const QVariant& setting);
     void setFlags(Qt::ItemFlags aFlags);
     void setHeaders(const QStringList& headers);
 
-    Item* getItem(const QModelIndex &index) const;
-    Setting* getSetting(const QModelIndex &index) const;
-    Item* getRootItem()const;
-    const QStringList& getHeaders();    
-
     void refresh();
-    void updateItems(Item* items);
     //Qt::DropActions supportedDropActions() const;
     //QStringList mimeTypes() const;
     //QMimeData *mimeData(const QModelIndexList &indexes) const;
@@ -47,5 +41,10 @@ private:
     Item* mRootItem{nullptr};
     QStringList mHeaders;
     Qt::ItemFlags mFlags;
+
+    Item* getItem(const QModelIndex &index) const;
+    Setting* getSetting(const QModelIndex &index) const;
+    Item* getRootItem()const;
+    const QStringList& getHeaders();
 };
 }

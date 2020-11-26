@@ -20,10 +20,7 @@ ItemTreeModel::ItemTreeModel(Item *rootItem, QObject *parent)
 
 QVariant ItemTreeModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
-        return QVariant();
-
-    if (role != Qt::DisplayRole && role != Qt::EditRole)
+    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::EditRole))
         return QVariant();
 
     Item *item = getItem(index);
@@ -31,20 +28,16 @@ QVariant ItemTreeModel::data(const QModelIndex &index, int role) const
     if(!item)
         return QVariant();
 
-    return QVariant().fromValue(item);
+    auto column = index.column();
+    return column == 0 ? QVariant().fromValue(item->getCaption()) : QVariant().fromValue(item->getSetting(column));
 }
 
 bool ItemTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role != Qt::EditRole)
+    if (!index.isValid() || role != Qt::EditRole)
         return false;
 
-    Item *item = getItem(index);
-    if(item == 0)
-        return false;
-
-    item = value.value<Item*>();
-    emit dataChanged(index, index);
+    setSettingValue(index, value);
 
     return true;
 }
@@ -150,11 +143,6 @@ int ItemTreeModel::rowCount(const QModelIndex &parent) const
     auto mParent = getItem(parent);
     return mParent ? mParent->getItems().count() : 0;
 }
-void ItemTreeModel::updateItems(Item* items)
-{
-    Q_UNUSED(items)
-    refresh();
-}
 
 void ItemTreeModel::setItems(Item* items)
 {
@@ -167,9 +155,9 @@ void ItemTreeModel::setItems(Item* items)
     endResetModel();
 }
 
-void ItemTreeModel::setSetting(const QModelIndex &index, const Setting *setting)
+void ItemTreeModel::setSettingValue(const QModelIndex &index, const QVariant& value)
 {
-    if(index.isValid() && setting)
+    if(index.isValid() && value.isValid())
     {
         auto item = getItem(index);
         if(item)
@@ -177,7 +165,7 @@ void ItemTreeModel::setSetting(const QModelIndex &index, const Setting *setting)
             auto itemSetting = item->getSetting(index.column());
             if(itemSetting)
             {
-                itemSetting->setValue(setting->getValue());
+                itemSetting->setValue(value);
             }
         }
     }

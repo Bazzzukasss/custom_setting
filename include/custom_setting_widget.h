@@ -21,7 +21,7 @@ public:
     void setReadOnly(bool is_read_only);
     void setSizeHint(int item_width, int item_height, int item_rows_count);
 
-    const custom_setting::Setting* getSetting() const;
+    QVariant getSettingValue() const;
 
 signals:
     void signalEditingFinished();
